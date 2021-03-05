@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<http:listener-config name="HTTP_Listener_config1" doc:name="HTTP Listener config" doc:id="e020a99d-6bea-4938-bf9a-fae47a2e5316" >
+		<http:listener-connection host="0.0.0.0" port="8086" />
+	</http:listener-config>
+	<flow name="retrive-dataFlow" doc:id="a02d1652-50cb-4783-bae9-2e04f0df9712" >
+		<http:listener doc:name="Listener" doc:id="bf9bcadb-1cea-4b70-8f55-544939872590" config-ref="HTTP_Listener_config" path="/request"/>
+		<http:request method="POST" doc:name="Customer-Request" doc:id="555487f0-346d-4750-ba3a-04e85209b845" url="http://localhost:8081/customer" />
+		<ee:transform doc:name="Transform Message" doc:id="12fd034d-f16e-4cc8-af8c-9cac35024bcd">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	Id: payload01.Id,
+	Firstname: payload01.Firstname,
+	Lastname: payload01.Lastname,
+	address: payload01.address
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#[payload]" doc:name="customer-Set Variable" doc:id="23f5a4a7-1e89-4b34-badc-871e876a3774" variableName="customer" />
+		<http:request method="POST" doc:name="Product-Request" doc:id="c6a9c3a4-4c37-47c4-8086-c0bb8ed24f66" url="http://localhost:8081/product"/>
+		<ee:transform doc:name="Transform Message" doc:id="b3debe9e-de42-4052-8bfc-067921479714" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	Id: payload01.Id,
+	Medison: payload01.Medison,
+	"type": payload01."type",
+	ExpireDate: payload01.ExpireDate
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#[payload]" doc:name="product-Set Variable" doc:id="d70368af-48cf-42c3-99ba-84720bd6fb94" variableName="product" />
+		<logger level="INFO" doc:name="Logger" doc:id="2b1d11b2-da62-458f-9dd4-5908138bb28f" message="#[vars.customer ++ vars.product]"/>
+		<set-payload value="#[vars.customer ++ vars.product]" doc:name="Set Payload" doc:id="bfdc2dec-df2b-4fe1-a320-5c9a325969e9" />
+		<logger level="INFO" doc:name="Logger" doc:id="86b46ff0-7056-4885-bef0-a7398d4da1e2" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="d60771f9-8893-4b99-8b03-d452224fe4a8" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.customer map ( customer , indexOfCustomer ) -> {
+	CustId: customer.Id,
+	Firstname: customer.Firstname,
+	Lastname: customer.Lastname,
+	address: customer.address
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<db:bulk-insert doc:name="PatientInfo Bulk insert" doc:id="69601d38-1e55-4f11-8983-d5bf6fc7484e" config-ref="Database_Config">
+			<reconnect />
+			<db:bulk-input-parameters ><![CDATA[#[{
+	Id: payload.Id,
+	Firstname: payload.Firstname,
+	Lastname: payload.Lastname,
+	address: payload.address,
+	Id: payload.Id,
+	Medison: payload.Medison,
+	"type": payload."type",
+	ExpireDate: payload.ExpireDate
+}]]]></db:bulk-input-parameters>
+			<db:sql ><![CDATA[insert into PatientInfo(Id,Firstname,Lastname,address,Medison,type,ExpireDate) 
+values(:Id,:Firstname,:Lastname,:address,:Medison,:type,:ExpireDate)]]></db:sql>
+		</db:bulk-insert>
+	</flow>
+	<flow name="Customer-retrive-dataFlow2" doc:id="95962c59-c421-4692-bea2-76d886c07b89" >
+		<http:listener doc:name="Listener" doc:id="7cc4cb80-933b-438a-9786-597b650ee4f5" config-ref="HTTP_Listener_config1" path="/customer"/>
+		<db:select doc:name="CustomerSelect" doc:id="b38e8a1d-dec1-4227-a290-8dc5c7028655" config-ref="Database_Config">
+			<db:sql><![CDATA[select Id,Firstname,Lastname,address from customer]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Cust-Transform Message" doc:id="dd379f8a-0921-445c-8bd6-e3354a5a7979">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	Id: payload01.Id,
+	Firstname: payload01.Firstname,
+	Lastname: payload01.Lastname,
+	address: payload01.address
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="productFlow-" doc:id="022ef556-67c1-43b7-b860-0db03ba49570" >
+		<http:listener doc:name="product_Listener" doc:id="ff719fd7-5987-4c84-b759-0020fe8ef506" config-ref="HTTP_Listener_config1" path="/product" />
+		<db:select doc:name="product_of_Select" doc:id="1919fb06-e581-4d96-97b6-4dffb93799c6" config-ref="Database_Config" >
+			<db:sql ><![CDATA[select Id,Medison,type,ExpireDate from product]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="product_Transform Message" doc:id="00b35e30-6c6d-41c3-8638-dbe4267eba37" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	Id: payload01.Id,
+	Medison: payload01.Medison,
+	"type": payload01."type",
+	ExpireDate: payload01.ExpireDate
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

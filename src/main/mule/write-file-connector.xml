@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp" xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd">
+	<os:object-store name="File_Object_store" doc:name="Object store" doc:id="c4b1d659-765f-47aa-aa73-295b915a7e70" />
+	<flow name="program-testingFlow" doc:id="adeb42af-659c-4eae-9176-704765c5e17b" >
+		<file:listener doc:name="On New or Updated File" doc:id="58b1a125-9d1f-4dde-811b-19fbce603d82" directory="C:\Users\hailu\Desktop\Test-mule-file2" autoDelete="true" moveToDirectory="C:\Users\hailu\Desktop\Test-mule-folder2">
+			<scheduling-strategy >
+				<fixed-frequency />
+			</scheduling-strategy>
+		</file:listener>
+		<logger level="INFO" doc:name="Logger" doc:id="45cf6fc4-f1ee-4feb-8adc-ae81a53a8f2e" message="#[payload]"/>
+		<choice doc:name="Choice" doc:id="4de95945-f0b8-4598-98dd-d7ddfe80d4a0" >
+			<when expression="#[payload.^mediaType == 'text/xml; charset=UTF-8']">
+				<ee:transform doc:name="text/xml" doc:id="f6f25fe5-918e-4b1d-a9c9-789a05ed55df">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression="#[payload.^mediaType == 'text/json; charset=UTF-8']">
+				<ee:transform doc:name="text/json" doc:id="a4ba4c0b-df6b-4946-bdbf-f526001b4531">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression="#[payload.^mediaType == 'text/java; charset=UTF-8']">
+				<ee:transform doc:name="text/java" doc:id="97fc1cb1-1029-4de9-9315-2399b5bd0a3a">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression="#[payload.^mediaType == 'text/csv; charset=UTF-8']">
+				<ee:transform doc:name="text/csv" doc:id="866892a6-e382-46ef-9359-9c33763cf411" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/csv
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise>
+				<logger level="INFO" doc:name="All other formats " doc:id="c55a15eb-2154-4205-8866-df045e543887" message="The unlisted formats will process here :#[payload]"/>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="Logger" doc:id="fc02c703-a08b-4397-83b1-1dde20f87bbf" message="end of the program :#[payload]"/>
+	</flow>
+</mule>

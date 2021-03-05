@@ -1,0 +1,133 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="input-json" format="json">
+      <types:shape format="weave" example="examples/employee.json"><![CDATA[%dw 2.0
+
+type input_json = Array<{|  id: String,   employee_name: String,   employee_salary: String,   employee_age: String,   profile_image: String|}> {"example": "[{\\\"id\\\":\\\"1\\\",\\\"employee_name\\\":\\\"Tiger Nixon\\\",\\\"employee_salary\\\":\\\"320800\\\",\\\"employee_age\\\":\\\"61\\\",\\\"profile_image\\\":\\\"\\\"},{\\\"id\\\":\\\"2\\\",\\\"employee_name\\\":\\\"Garrett Winters\\\",\\\"employee_salary\\\":\\\"170750\\\",\\\"employee_age\\\":\\\"63\\\",\\\"profile_image\\\":\\\"\\\"}]"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="Output-json" format="json">
+      <types:shape format="weave" example="examples/employee-1.json"><![CDATA[%dw 2.0
+
+type Output_json = Array<{|  id: String,   employee_name: String,   employee_salary: String,   employee_age: String,   profile_image: String|}> {"example": "[{\\\"id\\\":\\\"1\\\",\\\"employee_name\\\":\\\"Tiger Nixon\\\",\\\"employee_salary\\\":\\\"320800\\\",\\\"employee_age\\\":\\\"61\\\",\\\"profile_image\\\":\\\"\\\"},{\\\"id\\\":\\\"2\\\",\\\"employee_name\\\":\\\"Garrett Winters\\\",\\\"employee_salary\\\":\\\"170750\\\",\\\"employee_age\\\":\\\"63\\\",\\\"profile_image\\\":\\\"\\\"}]"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="p-input-json" format="json">
+      <types:shape format="weave" example="examples/product-2.json"><![CDATA[%dw 2.0
+
+type p_input_json = Array<{|  Id: Number {"typeId": "int"},   Medison: String,   "type": String,   ExpireDate: String|}> {"example": "[{\\\"Id\\\":1,\\\"Medison\\\":\\\"fgdshj\\\",\\\"type\\\":\\\"gdsjk\\\",\\\"ExpireDate\\\":\\\"12\\/34\\/2023\\\"},{\\\"Id\\\":2,\\\"Medison\\\":\\\"fgdshj\\\",\\\"type\\\":\\\"gdsjk\\\",\\\"ExpireDate\\\":\\\"12\\/34\\/2023\\\"}]"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="p-output-json" format="json">
+      <types:shape format="weave" example="examples/product-3.json"><![CDATA[%dw 2.0
+
+type p_output_json = Array<{|  Id: Number {"typeId": "int"},   Medison: String,   "type": String,   ExpireDate: String|}> {"example": "[{\\\"Id\\\":1,\\\"Medison\\\":\\\"fgdshj\\\",\\\"type\\\":\\\"gdsjk\\\",\\\"ExpireDate\\\":\\\"12\\/34\\/2023\\\"},{\\\"Id\\\":2,\\\"Medison\\\":\\\"fgdshj\\\",\\\"type\\\":\\\"gdsjk\\\",\\\"ExpireDate\\\":\\\"12\\/34\\/2023\\\"}]"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="cust-input-json" format="json">
+      <types:shape format="weave" example="examples/customer-5.json"><![CDATA[%dw 2.0
+
+type cust_input_json = Array<{|  Id: Number {"typeId": "int"},   Firstname: String,   Lastname: String,   address: String|}> {"example": "[{\\\"Id\\\":1,\\\"Firstname\\\":\\\"fsdgfgh\\\",\\\"Lastname\\\":\\\"ghsds\\\",\\\"address\\\":\\\"FHHGF\\\"},{\\\"Id\\\":2,\\\"Firstname\\\":\\\"fsdgfgh\\\",\\\"Lastname\\\":\\\"ghsds\\\",\\\"address\\\":\\\"FHHGF\\\"}]"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="cust-output-json" format="json">
+      <types:shape format="weave" example="examples/customer-6.json"><![CDATA[%dw 2.0
+
+type cust_output_json = Array<{|  Id: Number {"typeId": "int"},   Firstname: String,   Lastname: String,   address: String|}> {"example": "[{\\\"Id\\\":1,\\\"Firstname\\\":\\\"fsdgfgh\\\",\\\"Lastname\\\":\\\"ghsds\\\",\\\"address\\\":\\\"FHHGF\\\"},{\\\"Id\\\":2,\\\"Firstname\\\":\\\"fsdgfgh\\\",\\\"Lastname\\\":\\\"ghsds\\\",\\\"address\\\":\\\"FHHGF\\\"}]"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="PatientInfo-json" format="json">
+      <types:shape format="weave" example="examples/PatientInfo.json"><![CDATA[%dw 2.0
+
+type PatientInfo_json = Array<{|  CustId: Number {"typeId": "int"},   Firstname: String,   Lastname: String,   address: String,   prodId: Number {"typeId": "int"},   Medison: String,   "type": String,   ExpireDate: String|}> {"example": "[{\\\"CustId\\\":1,\\\"Firstname\\\":\\\"fsdgfgh\\\",\\\"Lastname\\\":\\\"ghsds\\\",\\\"address\\\":\\\"FHHGF\\\",\\\"prodId\\\":1,\\\"Medison\\\":\\\"fgdshj\\\",\\\"type\\\":\\\"gdsjk\\\",\\\"ExpireDate\\\":\\\"12\\/34\\/2023\\\"},{\\\"CustId\\\":2,\\\"Firstname\\\":\\\"fsdgfgh\\\",\\\"Lastname\\\":\\\"ghsds\\\",\\\"address\\\":\\\"FHHGF\\\",\\\"prodId\\\":2,\\\"Medison\\\":\\\"fgdshj\\\",\\\"type\\\":\\\"gdsjk\\\",\\\"ExpireDate\\\":\\\"12\\/34\\/2023\\\"}]"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#c0d53ee2-35fc-4854-b34b-b92300617b7d">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="input-json"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="Output-json"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#38426a8d-2d1c-4714-8040-2f1bc44924b5">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="p-input-json"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="p-output-json"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#12fd034d-f16e-4cc8-af8c-9cac35024bcd">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="cust-input-json"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="cust-output-json"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#b3debe9e-de42-4052-8bfc-067921479714">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="p-input-json"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="p-output-json"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#d60771f9-8893-4b99-8b03-d452224fe4a8">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="PatientInfo-json"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#272e04f4-47a4-4713-848c-b2adbe220d9c">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="input-json"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="Output-json"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

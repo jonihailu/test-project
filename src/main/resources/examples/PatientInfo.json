@@ -1,0 +1,22 @@
+[
+   {
+      "CustId": 1,
+      "Firstname": "fsdgfgh",
+      "Lastname": "ghsds",
+      "address": "FHHGF",
+      "prodId": 1,
+      "Medison": "fgdshj",
+      "type": "gdsjk",
+      "ExpireDate": "12/34/2023"
+   },
+   {
+      "CustId": 2,
+      "Firstname": "fsdgfgh",
+      "Lastname": "ghsds",
+      "address": "FHHGF",
+      "prodId": 2,
+      "Medison": "fgdshj",
+      "type": "gdsjk",
+      "ExpireDate": "12/34/2023"
+   }
+]

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<os:object-store name="Object_store" doc:name="Object store" doc:id="b107fb4e-4b9c-4851-a884-28accbef1b09" />
+	<os:object-store name="Retrive-Object_store" doc:name="Object store" doc:id="ee9a7420-8404-46af-ad07-c96a4e0ae1de" />
+	<flow name="object-storeFlow1" doc:id="b83933e0-7ef5-42a5-9619-e169cb44271e" >
+		<http:listener doc:name="Listener" doc:id="b6a3936c-19dc-4bef-b523-46879a638721" config-ref="HTTP_Listener_config" path="/store"/>
+		<logger level="INFO" doc:name="Logger" doc:id="1cd81163-1f9f-42c8-b453-6bb308cf3301" message="1st logger :#[payload]"/>
+		<os:store doc:name="Store" doc:id="e5617c3c-40e5-4530-8a53-7193371f4ce4" key="keyid" failIfPresent="true" objectStore="Retrive-Object_store">
+		</os:store>
+		<logger level="INFO" doc:name="Logger" doc:id="90f9305a-016c-477c-979f-21005007e00f" message="2nd logger :#[payload]"/>
+	</flow>
+	<flow name="Retrive-object-storeFlow" doc:id="71f92cff-f631-41e8-a362-4a9ead00d9ea" >
+		<http:listener doc:name="Retrive-Listener" doc:id="41b4b3c5-7939-41e8-bd40-907fd09c29c9" config-ref="HTTP_Listener_config" path="/retrive"/>
+		<os:retrieve doc:name="Retrieve" doc:id="0bd94b49-98a8-45d6-91fb-f0ad6342a60a" key="keys" objectStore="Retrive-Object_store">
+		</os:retrieve>
+		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="02b2a729-a296-4d26-b3ff-53a6d1ecdd09" />
+	</flow>
+	http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<http:listener-config name="HTTP_Listener_config3" doc:name="HTTP Listener config" doc:id="31429fb3-f540-4652-a99e-bb41b376d7ba" >
+		<http:listener-connection host="0.0.0.0" port="8087" />
+	</http:listener-config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="1433a43a-eb9c-4b0f-8448-2fea8fd9b9dc" >
+		<file:connection workingDir="C:\Users\hailu\Desktop\Test-Batching" />
+	</file:config>
+	<file:config name="File_Config1" doc:name="File Config" doc:id="cb715a36-a600-4b4a-b75f-1fff337c5fb7" >
+		<file:connection workingDir="C:\Users\hailu\Desktop\Test-Batching1" />
+	</file:config>
+	<db:config name="Database_Config1" doc:name="Database Config" doc:id="934e40d9-6a81-47d8-bce3-5b725b93882a" >
+		<db:mssql-connection host="localhost" port="1433" user="joni" password="123456" databaseName="ethiopia" />
+	</db:config>
+	<flow name="Main-Flow" doc:id="599b1dff-df28-4fbd-ae6b-4405d568ed9a" >
+		<http:listener doc:name="Listener" doc:id="68023023-39f0-4889-81cc-db80ed01fbce" config-ref="HTTP_Listener_config" path="/tests" >
+		</http:listener>
+		<logger level="INFO" doc:name="Logger" doc:id="9a336f0c-c76d-47df-9c4f-a8dba7391732" message="#[payload]" />
+		<db:select doc:name="Select" doc:id="63daa6b3-3433-4cee-9c69-c4643db851b1" config-ref="Database_Config">
+			<db:sql ><![CDATA[select Id,fullname,status from test where Id=:Id]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{Id: attributes.queryParams.Id}]]]></db:input-parameters>
+		</db:select>
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="8e438772-4d5d-4a22-a075-b53a354ed3bc" variableName="setvar"/>
+		<ee:transform doc:name="Transform Message" doc:id="c4ae8afd-8bd9-46c4-a54d-1340341f492d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	Id: payload01.Id default 0,
+	fullname: payload01.fullname default "",
+	status: payload01.status default ""
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-payload value="#[vars.setvar]" doc:name="Set Payload" doc:id="d641a821-648e-4ea6-8638-679f4819e691" />
+		<logger level="INFO" doc:name="Logger" doc:id="cabaac32-0af5-46e5-ba4a-4087efb88d58" message="#[payload]" />
+		<choice doc:name="Choice" doc:id="5f315210-9a3f-42f5-afa9-af00c78e9c6b">
+			<when expression='#[payload.status == "A"]'>
+						<file:write doc:name="ActiveWrite" doc:id="ec9f25f5-56ed-4afe-908b-c237419e742b" path="C:\Users\hailu\Desktop\Test-mule-file2\active.txt" config-ref="File_Config" />
+					</when>
+					<when expression='#[payload.status == "I"]'>
+				<file:write doc:name="InactiveWrite" doc:id="972efed6-b04f-4f1d-b911-bb6fab0cd435" config-ref="File_Config1" path="C:\Users\hailu\Desktop\Test-mule-file2\inactive.txt" />
+			</when>
+			<otherwise>
+						<logger level="INFO" doc:name="Logger" doc:id="de26623b-c06b-492c-8075-02a0d9c35d5e" message="#[payload]" />
+			</otherwise>
+		</choice>
+	</flow>
+</mule>

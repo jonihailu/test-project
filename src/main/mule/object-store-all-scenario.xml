@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<os:object-store name="Object_store1" doc:name="Object store" doc:id="5033d94f-bfb8-4140-a76b-c3eddd36f710" />
+	<http:listener-config name="HTTP_Listener_config2" doc:name="HTTP Listener config" doc:id="77ee4e48-7111-4682-8bca-466a24c4d166" >
+		<http:listener-connection host="0.0.0.0" port="8082" />
+	</http:listener-config>
+	<flow name="object-store-all-scenarioFlow-Store" doc:id="912e8461-360a-4db9-b1ee-2277a86123d8" >
+		<http:listener doc:name="Store/Listener" doc:id="6a1bdeec-600c-4e71-82eb-992fab4a0702" config-ref="HTTP_Listener_config2" path="/store"/>
+		<logger level="INFO" doc:name="Logger" doc:id="0e448cbd-9d2c-4815-9d45-a65743806c48" message="payload before stores == #[payload]"/>
+		<os:store doc:name="Store" doc:id="baba77b1-bac6-4b97-b6c6-8d8d1c9f74b4" key="#[payload.store]" objectStore="Object_store1">
+			<os:value ><![CDATA[#[payload.value]]]></os:value>
+		</os:store>
+		<logger level="INFO" doc:name="Logger" doc:id="eaf04492-1f2d-4391-b01a-5b6d1217ec6e" message="payload after stored == #[payload]"/>
+		<file:write doc:name="Write" doc:id="43a56494-75ad-40f1-99ad-b9f66381dc59" path="C:\Users\hailu\Desktop\Test-mule-folder2\objectStore.txt" mode="APPEND"/>
+	</flow>
+	<flow name="object-store-all-scenarioFlow-Retrieve" doc:id="08025fe8-08c6-4a65-9e9d-feff646c088c" >
+		<http:listener doc:name="Retrieve/Listener" doc:id="82ca02b5-f58e-4491-8059-71a2463c78d2" config-ref="HTTP_Listener_config2" path="/retrieve"/>
+		<logger level="INFO" doc:name="Logger" doc:id="d6e6953f-4e37-47e3-b6a8-02c16669b419" message="payload before retrieve == #[payload]"/>
+		<os:retrieve doc:name="Retrieve" doc:id="6ae14d5c-65a9-4e29-af84-1da42683fd63" key="#[payload.store]" objectStore="Object_store1">
+			<os:default-value ><![CDATA[Default Value]]></os:default-value>
+		</os:retrieve>
+		<logger level="INFO" doc:name="Logger" doc:id="dcba0d6a-0ed9-431e-b964-bd629c81aee7" message="payload after retrieve == #[payload]"/>
+	</flow>
+	<flow name="object-store-all-scenarioFlow-RetriveAll" doc:id="8fc98b54-70a6-4b4d-9a7e-f498f20d0264" >
+		<http:listener doc:name="ReteriveAll/Listener" doc:id="a4e95fa4-18a1-4bca-8f10-af03a06d8f47" config-ref="HTTP_Listener_config2" path="/retriveall"/>
+		<logger level="INFO" doc:name="Logger" doc:id="247ee468-a10f-45e8-8021-b4e97b400253" message="payload before retrieveall == #[payload]"/>
+		<os:retrieve-all doc:name="Retrieve all" doc:id="a7543291-489c-4f86-9656-e7ad4f64b248" objectStore="Object_store1"/>
+		<logger level="INFO" doc:name="Logger" doc:id="240e8850-eeb2-4317-91ed-9de43d24d08d" message="payload after retrieveall == #[payload]"/>
+	</flow>
+	<flow name="object-store-all-scenarioFlow-Retrieveallkeys" doc:id="6148705a-1a89-4c9d-97ec-4179fe08c130" >
+		<http:listener doc:name="Retrieveallkeys/Listener" doc:id="00a0fe67-1e25-486f-9264-f4c4650e4539" path="/retrieveallkeys" config-ref="HTTP_Listener_config2"/>
+		<logger level="INFO" doc:name="Logger" doc:id="0e42929a-a8eb-49b8-a8c1-02f86efa041c" message="payload before retrieveallkeys == #[payload]"/>
+		<os:retrieve-all-keys doc:name="Retrieve all keys" doc:id="efaee4ae-1112-4ec5-adc8-f5e9e4dd33c4" objectStore="Object_store1"/>
+		<logger level="INFO" doc:name="Logger" doc:id="bf200ddd-381d-4791-ae0c-c62babb7ccc8" message="payload after retrievedallkeys == #[payload]"/>
+	</flow>
+	<flow name="object-store-all-scenarioFlow-Contains" doc:id="ae582b06-88c2-42db-afde-62f8250f2b6e" >
+		<http:listener doc:name="Contains/Listener" doc:id="bf2d0108-3a21-4b6b-bb48-e9165acf62ba" config-ref="HTTP_Listener_config2" path="/contains"/>
+		<logger level="INFO" doc:name="Logger" doc:id="c2a707f5-a318-4784-a4c9-3c5a1d8984c8" message="payload before contains == #[payload]"/>
+		<os:contains doc:name="Contains" doc:id="e5dbf348-7200-48fc-9949-1512ddd316f0" key="#[payload.store]" objectStore="Object_store1"/>
+		<logger level="INFO" doc:name="Logger" doc:id="ae2579ad-d471-4dd1-9e58-cb562852c447" message="payload after contains == #[payload]"/>
+	</flow>
+	<flow name="object-store-all-scenarioFlow-Remove" doc:id="651a2139-616e-40ab-96f0-5952978dab67" >
+		<http:listener doc:name="Listener" doc:id="431cb1dd-36e7-4c6d-9cbd-772fa8412341" config-ref="HTTP_Listener_config2" path="/remove"/>
+		<logger level="INFO" doc:name="Logger" doc:id="54841115-c087-49ee-a699-0fedd119d01b" message="payload before remove == #[payload]"/>
+		<os:remove doc:name="Remove" doc:id="5d892e07-5eed-430d-b1b9-b2a3ab8af1d3" key="#[payload.store]" objectStore="Object_store1"/>
+		<logger level="INFO" doc:name="Logger" doc:id="84a04a56-e424-42ee-ae41-20f91f6bcbc1" message="payload after removed == #[payload]"/>
+	</flow>
+	<flow name="object-store-all-scenarioFlow-Clear" doc:id="fcdfc431-1b19-4f73-ae9e-26552dc60573" >
+		<http:listener doc:name="Clear/Listener" doc:id="58d4bcb2-8532-473d-9c23-5e68808fa8d3" path="/clear" config-ref="HTTP_Listener_config2"/>
+		<logger level="INFO" doc:name="Logger" doc:id="9a592b2d-2ce5-48ed-b99d-70884a2d873c" message="payload before clear == #[payload]"/>
+		<os:clear doc:name="Clear" doc:id="d73860c6-1707-41ba-8be7-d4bc77e6ec03" objectStore="Object_store1"/>
+		<logger level="INFO" doc:name="Logger" doc:id="8a1a1806-729c-4b72-b39f-5733e68da048" message="payload after cleared == #[payload]"/>
+	</flow>
+</mule>
